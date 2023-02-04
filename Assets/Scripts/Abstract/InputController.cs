@@ -8,5 +8,7 @@ public abstract class InputController : ScriptableObject
 
     public abstract float RetrieveYInput();
 
-    public abstract bool RetrieveRoll();
+    public abstract bool RetrieveSlide();
+
+    public abstract bool RetrieveAttack();
 }

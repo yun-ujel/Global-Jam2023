@@ -15,8 +15,13 @@ public class BossController : InputController
         return Input.GetAxisRaw("Vertical");
     }
 
-    public override bool RetrieveRoll()
+    public override bool RetrieveSlide()
     {
         return Input.GetButton("Jump") || Input.GetMouseButton(1);
+    }
+
+    public override bool RetrieveAttack()
+    {
+        return false;
     }
 }

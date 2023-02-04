@@ -5,21 +5,21 @@ using UnityEngine;
 public class Movement : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private InputController inputC;
-    [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private CursorPosition cursorPos;
+    [SerializeField] private InputController inputController;
+    [SerializeField] private Rigidbody2D body;
+    [SerializeField] private CursorPosition cursorPosition;
 
     [Header("Speed Values")]
     [SerializeField, Range(0f, 100f)] private float maxSpeed = 4f;
     [SerializeField, Range(0f, 100f)] private float acceleration = 35f;
-    float speedDivider;
+    private float speedDivider;
 
     [Header("Rolling")]
     [SerializeField, Range(0f, 100f)] private float rollSpeed = 4f;
-    [SerializeField, Range(0f, 10f)] float rollCooldown;
-    float rollCooldownCounter;
+    [SerializeField, Range(0f, 10f)] private float rollCooldown;
+    private float rollCooldownCounter;
 
-    [SerializeField, Range(0f, 5f)] float rollDuration;
+    [SerializeField, Range(0f, 5f)] private float rollDuration;
     [HideInInspector] public float rollCounter; // Time Spent rolling
 
     Vector2 direction;
@@ -28,17 +28,15 @@ public class Movement : MonoBehaviour
     Vector2 desiredVelocity;
     Vector2 velocity;
 
-    private float maxSpeedChange;
-
     void Update()
     {
-        direction = new Vector2(inputC.RetrieveXInput(), inputC.RetrieveYInput());
+        direction = new Vector2(inputController.RetrieveXInput(), inputController.RetrieveYInput());
         if (direction.sqrMagnitude > 1f)
         {
             direction = direction.normalized;
         }
 
-        if (inputC.RetrieveRoll() && rollCooldownCounter <= 0f)
+        if (inputController.RetrieveSlide() && rollCooldownCounter <= 0f)
         {
             Roll();
 
@@ -54,7 +52,7 @@ public class Movement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        velocity = rb.velocity;
+        velocity = body.velocity;
 
         if (rollCounter > 0f)
         {
@@ -64,7 +62,7 @@ public class Movement : MonoBehaviour
         }
         else
         {
-            maxSpeedChange = acceleration * Time.deltaTime;
+            float maxSpeedChange = acceleration * Time.deltaTime;
             velocity = new Vector2
             (
                 Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange),
@@ -72,14 +70,14 @@ public class Movement : MonoBehaviour
             );
         }
 
-        rb.velocity = velocity;
+        body.velocity = velocity;
     }
 
     void Roll()
     {
         if (direction == Vector2.zero)
         {
-            rollDirection = (cursorPos.position - new Vector2(transform.position.x, transform.position.y)).normalized;
+            rollDirection = (new Vector2(cursorPosition.worldPosition.x, cursorPosition.worldPosition.y) - new Vector2(transform.position.x, transform.position.y)).normalized;
         }
         else
         {

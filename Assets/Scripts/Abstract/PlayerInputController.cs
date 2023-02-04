@@ -15,8 +15,13 @@ public class PlayerInputController : InputController
         return Input.GetAxisRaw("Vertical");
     }
 
-    public override bool RetrieveRoll()
+    public override bool RetrieveSlide()
     {
         return Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(1);
+    }
+
+    public override bool RetrieveAttack()
+    {
+        return Input.GetButtonDown("Fire1");
     }
 }

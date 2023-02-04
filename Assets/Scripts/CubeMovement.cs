@@ -9,19 +9,19 @@ public class CubeMovement : MonoBehaviour
     [SerializeField] private Rigidbody rb;
     public GameObject hitBox;
 
-    [Header("Speed Values")]
-    [SerializeField, Range(0f, 10f)] private float slideSpeed;
-    [SerializeField, Range(0f, 10f)] private float maxSlideDistance;
-    [SerializeField] private float maxRotationSpeed = 120f;
-    Vector3 lastSlidePosition;
-    Vector2 slideDir;
-    bool isSliding;
+    [Header("Sliding")]
+    [SerializeField, Range(0f, 100f)] private float slideAcceleration;
+    [SerializeField, Range(0f, 100f)] private float maxSlideSpeed;
+    [SerializeField, Range(0f, 100f)] private float maxSlideDistance;
+    private Vector3 lastSlidePosition;
+    private Vector2 slideDir;
+    private bool isSliding;
 
-
-    Vector3 rotatePivot;
-    bool isFlipping;
-
-    float rotationProgress;
+    [Header("Flipping")]
+    [SerializeField] private float flipRotationSpeed = 120f;
+    private Vector3 rotatePivot;
+    private float rotationProgress;
+    private bool isFlipping;
 
     private MoveDir moveDir;
     private enum MoveDir
@@ -57,9 +57,11 @@ public class CubeMovement : MonoBehaviour
 
     }
 
+
+
     void GetInputs()
     {
-        if (!inputC.RetrieveRoll())
+        if (!inputC.RetrieveSlide())
         {
             if (inputC.RetrieveXInput() == 1f)
             {
@@ -108,7 +110,16 @@ public class CubeMovement : MonoBehaviour
     {
         if (Vector3.Distance(lastSlidePosition, transform.position) < maxSlideDistance)
         {
-            rb.velocity = new Vector3(slideDir.x * slideSpeed, slideDir.y * slideSpeed, 0);
+            Vector2 desiredSlideSpeed = slideDir * maxSlideSpeed;
+            float maxSpeedChange = slideAcceleration * Time.deltaTime;
+
+            rb.velocity = new Vector3
+            (
+            Mathf.MoveTowards(rb.velocity.x, desiredSlideSpeed.x, maxSpeedChange),
+            Mathf.MoveTowards(rb.velocity.y, desiredSlideSpeed.y, maxSpeedChange),
+            0
+            );
+            
             hitBox.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + (transform.localScale.x * 0.5f));
         }
         else
@@ -119,9 +130,30 @@ public class CubeMovement : MonoBehaviour
         }
     }
 
+    void FlipRight()
+    {
+        Vector3 position = transform.position;
+        rotatePivot = new Vector3(position.x + (transform.localScale.x * 0.5f), position.y, position.z + (transform.localScale.x * 0.5f));
+    }
+    void FlipLeft()
+    {
+        Vector3 position = transform.position;
+        rotatePivot = new Vector3(position.x - (transform.localScale.x * 0.5f), position.y, position.z + (transform.localScale.x * 0.5f));
+    }
+    void FlipUp()
+    {
+        Vector3 position = transform.position;
+        rotatePivot = new Vector3(position.x, position.y + (transform.localScale.x * 0.5f), position.z + (transform.localScale.x * 0.5f));
+    }
+    void FlipDown()
+    {
+        Vector3 position = transform.position;
+        rotatePivot = new Vector3(position.x, position.y - (transform.localScale.x * 0.5f), position.z + (transform.localScale.x * 0.5f));
+    }
+
     void DoFlip()
     {
-        float rotationSpeed = Time.deltaTime * maxRotationSpeed;
+        float rotationSpeed = Time.deltaTime * flipRotationSpeed;
 
         if (moveDir == MoveDir.right)
         {
@@ -149,26 +181,5 @@ public class CubeMovement : MonoBehaviour
 
         rotationProgress = 0f;
         isFlipping = false;
-    }
-
-    void FlipRight()
-    {
-        Vector3 position = transform.position;
-        rotatePivot = new Vector3(position.x + (transform.localScale.x * 0.5f), position.y, position.z + (transform.localScale.x * 0.5f));
-    }
-    void FlipLeft()
-    {
-        Vector3 position = transform.position;
-        rotatePivot = new Vector3(position.x - (transform.localScale.x * 0.5f), position.y, position.z + (transform.localScale.x * 0.5f));
-    }
-    void FlipUp()
-    {
-        Vector3 position = transform.position;
-        rotatePivot = new Vector3(position.x, position.y + (transform.localScale.x * 0.5f), position.z + (transform.localScale.x * 0.5f));
-    }
-    void FlipDown()
-    {
-        Vector3 position = transform.position;
-        rotatePivot = new Vector3(position.x, position.y - (transform.localScale.x * 0.5f), position.z + (transform.localScale.x * 0.5f));
     }
 }

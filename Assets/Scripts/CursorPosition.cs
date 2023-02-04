@@ -2,25 +2,40 @@ using UnityEngine;
 
 public class CursorPosition : MonoBehaviour
 {
-    public Vector2 position;
-    public Camera mainCamera;
-    public Transform ransform;
+    private Vector3 screenPosition;
+    public Vector3 worldPosition;
+    public Transform myTransform;
 
-    private void Awake()
+    bool freezePosition = false;
+    private void Update()
     {
-        if (mainCamera == null)
+        if (!freezePosition)
         {
-            mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+            screenPosition = Input.mousePosition;
+            screenPosition.z = CalculateDistance();
+
+            worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
+
+            if (myTransform != null)
+            {
+                myTransform.position = worldPosition;
+            }
+        }
+        if (Input.GetKey(KeyCode.Space))
+        {
+            freezePosition = true;
         }
     }
 
-    private void Update()
+    RaycastHit hit;
+    float CalculateDistance()
     {
-        position = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 direction = Vector3.Normalize(worldPosition - Camera.main.transform.position);
 
-        if (ransform != null)
-        {
-            ransform.position = position;
-        }
+        Ray ray = new Ray(Camera.main.transform.position, direction);
+
+        Physics.Raycast(ray, out hit, 100f, 4);
+
+        return Vector3.Distance(Camera.main.transform.position, hit.point);
     }
 }
