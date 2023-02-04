@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "PlayerInputController", menuName = "InputController/PlayerInputController")]
-public class PlayerInputController : InputController
+[CreateAssetMenu(fileName = "BossController", menuName = "InputController/BossController")]
+public class BossController : InputController
 {
     public override float RetrieveXInput()
     {
@@ -17,6 +17,6 @@ public class PlayerInputController : InputController
 
     public override bool RetrieveRoll()
     {
-        return Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(1);
+        return Input.GetButton("Jump") || Input.GetMouseButton(1);
     }
 }

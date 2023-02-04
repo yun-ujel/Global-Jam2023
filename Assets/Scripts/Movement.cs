@@ -38,7 +38,7 @@ public class Movement : MonoBehaviour
             direction = direction.normalized;
         }
 
-        if (inputC.RetrieveRollInput() && rollCooldownCounter <= 0f)
+        if (inputC.RetrieveRoll() && rollCooldownCounter <= 0f)
         {
             Roll();
 

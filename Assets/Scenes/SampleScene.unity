@@ -176,7 +176,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -218,6 +218,7 @@ GameObject:
   - component: {fileID: 578621183}
   - component: {fileID: 578621181}
   - component: {fileID: 578621180}
+  - component: {fileID: 578621179}
   m_Layer: 0
   m_Name: BossCube
   m_TagString: Boss
@@ -225,6 +226,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!54 &578621179
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 578621178}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!23 &578621180
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -283,7 +300,7 @@ Transform:
   m_GameObject: {fileID: 578621178}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 4, y: 4, z: 4}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
@@ -300,9 +317,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 617a35dfa393f6e458864162fa7dd0f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputC: {fileID: 11400000, guid: a76f806262d97974c8120db1d437f401, type: 2}
+  inputC: {fileID: 11400000, guid: ed243997904b4ad4590c3237c0568f6d, type: 2}
+  rb: {fileID: 578621179}
   hitBox: {fileID: 1769365375}
-  rotationProgress: 0
+  slideSpeed: 10
+  maxSlideDistance: 4
   maxRotationSpeed: 120
 --- !u!1 &1217495119
 GameObject:
@@ -501,7 +520,7 @@ Transform:
   m_GameObject: {fileID: 1769365375}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 4, y: 4, z: 4}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -543,9 +562,9 @@ MonoBehaviour:
   inputC: {fileID: 11400000, guid: a76f806262d97974c8120db1d437f401, type: 2}
   rb: {fileID: 2147302502}
   cursorPos: {fileID: 2147302505}
-  maxSpeed: 3
+  maxSpeed: 4
   acceleration: 80
-  rollSpeed: 5
+  rollSpeed: 6
   rollCooldown: 0.05
   rollDuration: 0.5
   rollCounter: 0
@@ -608,7 +627,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2147302498}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.8169497, y: 1.6935035, z: 0}
+  m_LocalPosition: {x: 9.76, y: 4.62, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 0}

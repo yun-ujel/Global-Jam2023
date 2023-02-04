@@ -4,13 +4,24 @@ using UnityEngine;
 
 public class CubeMovement : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField] private InputController inputC;
-
+    [SerializeField] private Rigidbody rb;
     public GameObject hitBox;
-    Vector3 rotatePivot;
-    bool isMoving;
 
-    public float rotationProgress;
+    [Header("Speed Values")]
+    [SerializeField, Range(0f, 10f)] private float slideSpeed;
+    [SerializeField, Range(0f, 10f)] private float maxSlideDistance;
+    [SerializeField] private float maxRotationSpeed = 120f;
+    Vector3 lastSlidePosition;
+    Vector2 slideDir;
+    bool isSliding;
+
+
+    Vector3 rotatePivot;
+    bool isFlipping;
+
+    float rotationProgress;
 
     private MoveDir moveDir;
     private enum MoveDir
@@ -21,26 +32,90 @@ public class CubeMovement : MonoBehaviour
         right
     }
 
-    public float maxRotationSpeed;
-
     void Update()
     {
-        if (isMoving)
+        if (!isFlipping && !isSliding)
         {
-            hitBox.SetActive(false);
-        }
-
-        if (!isMoving)
-        {
+            hitBox.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + (transform.localScale.x * 0.5f));
             GetInputs();
         }
-        else if (rotationProgress < 90f)
+        else if (rotationProgress < 90f && isFlipping)
         {
+            hitBox.SetActive(false);
             DoFlip();
+        }
+        else if (isFlipping)
+        {
+            FinishFlip();
+            hitBox.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + (transform.localScale.x * 0.5f));
+            hitBox.SetActive(true);
+        }
+        else if (isSliding)
+        {
+            DoSlide();
+        }
+
+    }
+
+    void GetInputs()
+    {
+        if (!inputC.RetrieveRoll())
+        {
+            if (inputC.RetrieveXInput() == 1f)
+            {
+                FlipRight();
+                isFlipping = true;
+                moveDir = MoveDir.right;
+            }
+            else if (inputC.RetrieveXInput() == -1f)
+            {
+                FlipLeft();
+                isFlipping = true;
+                moveDir = MoveDir.left;
+            }
+            else if (inputC.RetrieveYInput() == 1f)
+            {
+                FlipUp();
+                isFlipping = true;
+                moveDir = MoveDir.up;
+            }
+            else if (inputC.RetrieveYInput() == -1f)
+            {
+                FlipDown();
+                isFlipping = true;
+                moveDir = MoveDir.down;
+            }
         }
         else
         {
-            FinishFlip();
+            slideDir = new Vector2(inputC.RetrieveXInput(), inputC.RetrieveYInput());
+
+            if (slideDir != Vector2.zero)
+            {
+                Slide();
+            }
+        }
+    }
+
+    void Slide()
+    {
+        Debug.Log("Slide");
+        lastSlidePosition = transform.position;
+        isSliding = true;
+    }
+
+    void DoSlide()
+    {
+        if (Vector3.Distance(lastSlidePosition, transform.position) < maxSlideDistance)
+        {
+            rb.velocity = new Vector3(slideDir.x * slideSpeed, slideDir.y * slideSpeed, 0);
+            hitBox.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + (transform.localScale.x * 0.5f));
+        }
+        else
+        {
+            rb.velocity = Vector3.zero;
+            isSliding = false;
+            hitBox.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + (transform.localScale.x * 0.5f));
         }
     }
 
@@ -68,45 +143,13 @@ public class CubeMovement : MonoBehaviour
         rotationProgress += rotationSpeed;
     }
 
-    void GetInputs()
-    {
-        if (inputC.RetrieveXInput() == 1f)
-        {
-            FlipRight();
-            isMoving = true;
-            moveDir = MoveDir.right;
-        }
-        else if (inputC.RetrieveXInput() == -1f)
-        {
-            FlipLeft();
-            isMoving = true;
-            moveDir = MoveDir.left;
-        }
-        else if (inputC.RetrieveYInput() == 1f)
-        {
-            FlipUp();
-            isMoving = true;
-            moveDir = MoveDir.up;
-        }
-        else if (inputC.RetrieveYInput() == -1f)
-        {
-            FlipDown();
-            isMoving = true;
-            moveDir = MoveDir.down;
-        }
-    }
-
     void FinishFlip()
     {
         transform.position = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
 
-        hitBox.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + (transform.localScale.x * 0.5f));
-        hitBox.SetActive(true);
-
         rotationProgress = 0f;
-        isMoving = false;
+        isFlipping = false;
     }
-
 
     void FlipRight()
     {
