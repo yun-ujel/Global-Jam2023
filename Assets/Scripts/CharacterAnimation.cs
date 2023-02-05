@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CharacterAnimation : MonoBehaviour
 {
-    [SerializeField] private Movement movement;
+    [SerializeField] private PlayerMovement movement;
     [SerializeField] private SpriteRenderer spriteRenderer;
     bool isRolling;
 

@@ -5,16 +5,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "BossController", menuName = "InputController/BossController")]
 public class BossController : InputController
 {
-    public override float RetrieveXInput()
-    {
-        return Input.GetAxisRaw("Horizontal");
-    }
-
-    public override float RetrieveYInput()
-    {
-        return Input.GetAxisRaw("Vertical");
-    }
-
     public override bool RetrieveSlide()
     {
         return Input.GetButton("Jump") || Input.GetMouseButton(1);
@@ -23,5 +13,10 @@ public class BossController : InputController
     public override bool RetrieveAttack()
     {
         return false;
+    }
+
+    public override Vector2 RetrieveXYInputs()
+    {
+        return new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
     }
 }

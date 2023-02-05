@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Movement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private InputController inputController;
@@ -30,7 +30,8 @@ public class Movement : MonoBehaviour
 
     void Update()
     {
-        direction = new Vector2(inputController.RetrieveXInput(), inputController.RetrieveYInput());
+        direction = inputController.RetrieveXYInputs();
+
         if (direction.sqrMagnitude > 1f)
         {
             direction = direction.normalized;
