@@ -6,6 +6,7 @@ public class Attack : MonoBehaviour
 {
     [SerializeField] float bossHealth;
     [SerializeField] float maxDamage;
+    [SerializeField] BossMovement bM;
     float damage;
 
     [SerializeField] Slider slider;
@@ -18,12 +19,18 @@ public class Attack : MonoBehaviour
     private void Update()
     {
         slider.value = bossHealth;
+
+        if (bossHealth < 0f)
+        {
+            Destroy(bM.hitBox);
+            Destroy(bM.gameObject);
+        }
     }
 
     public void DealDamage()
     {
 
-        damage = Mathf.MoveTowards(damage, maxDamage, Time.deltaTime);
+        damage = Mathf.MoveTowards(damage, maxDamage, 2 * Time.deltaTime);
 
         bossHealth -= damage;
     }

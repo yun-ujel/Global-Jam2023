@@ -21,10 +21,6 @@ public class CursorPosition : MonoBehaviour
                 myTransform.position = worldPosition;
             }
         }
-        if (Input.GetKey(KeyCode.Space))
-        {
-            freezePosition = true;
-        }
     }
 
     RaycastHit hit;

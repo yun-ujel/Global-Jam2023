@@ -15,7 +15,6 @@ public class BossMovement : MonoBehaviour
     [SerializeField, Range(0f, 100f)] private float slideAcceleration;
     [SerializeField, Range(0f, 100f)] private float maxSlideSpeed;
     [SerializeField, Range(0f, 100f)] private float maxSlideDistance;
-    private Vector3 lastSlidePosition;
     private bool isSliding;
 
     Vector2 moveDir;
@@ -28,7 +27,7 @@ public class BossMovement : MonoBehaviour
     private bool isFlipping;
 
     [Header("Difficulty")]
-    [SerializeField] private float actionCooldown;
+    public float actionCooldown;
     private float actionCooldownCounter;
     [SerializeField] private float slideStartup;
 
@@ -73,11 +72,13 @@ public class BossMovement : MonoBehaviour
         {
             if (direction.x != 0)
             {
+                LockPosition();
                 moveDir = new Vector2(direction.x, 0);
                 isSliding = true;
             }
             else if (direction.y != 0)
             {
+                LockPosition();
                 moveDir = new Vector2(0, direction.y);
                 isSliding = true;
             }
@@ -110,12 +111,7 @@ public class BossMovement : MonoBehaviour
 
     void FlipHorizontal(Vector2 direction)
     {
-        Vector2 gridPosition = CalculateGridPosition();
-        transform.position = new Vector3(gridPosition.x * transform.localScale.x, gridPosition.y * transform.localScale.y, -(transform.localScale.x * 0.5f));
-
-        Vector3 rotationAsQuarters = new Vector3(Mathf.Round(transform.localEulerAngles.x / 90f), Mathf.Round(transform.localEulerAngles.y / 90f), Mathf.Round(transform.localEulerAngles.z / 90f));
-
-        transform.rotation = Quaternion.Euler(rotationAsQuarters.x * 90f, rotationAsQuarters.y * 90f, rotationAsQuarters.z * 90f);
+        LockPosition();
 
         moveDir = new Vector2(direction.x, 0);
         rotateDir = new Vector2(0, -direction.x);
@@ -127,12 +123,7 @@ public class BossMovement : MonoBehaviour
 
     void FlipVertical(Vector2 direction)
     {
-        Vector2 gridPosition = CalculateGridPosition();
-        transform.position = new Vector3(gridPosition.x * transform.localScale.x, gridPosition.y * transform.localScale.y, -(transform.localScale.x * 0.5f));
-
-        Vector3 rotationAsQuarters = new Vector3(Mathf.Round(transform.localEulerAngles.x / 90f), Mathf.Round(transform.localEulerAngles.y / 90f), Mathf.Round(transform.localEulerAngles.z / 90f));
-
-        transform.rotation = Quaternion.Euler(rotationAsQuarters.x * 90f, rotationAsQuarters.y * 90f, rotationAsQuarters.z * 90f);
+        LockPosition();
 
         moveDir = new Vector2(0, direction.y);
         rotateDir = new Vector2(direction.y, 0);
@@ -142,7 +133,15 @@ public class BossMovement : MonoBehaviour
         isFlipping = true;
     }
  
-    
+    void LockPosition()
+    {
+        Vector2 gridPosition = CalculateGridPosition();
+        transform.position = new Vector3(gridPosition.x * transform.localScale.x, gridPosition.y * transform.localScale.y, -(transform.localScale.x * 0.5f));
+
+        Vector3 rotationAsQuarters = new Vector3(Mathf.Round(transform.localEulerAngles.x / 90f), Mathf.Round(transform.localEulerAngles.y / 90f), Mathf.Round(transform.localEulerAngles.z / 90f));
+
+        transform.rotation = Quaternion.Euler(rotationAsQuarters.x * 90f, rotationAsQuarters.y * 90f, rotationAsQuarters.z * 90f);
+    }
 
     void DoSlide(Vector2 desiredVelocity)
     {
