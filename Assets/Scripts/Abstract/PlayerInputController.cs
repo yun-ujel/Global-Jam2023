@@ -12,7 +12,7 @@ public class PlayerInputController : InputController
 
     public override bool RetrieveAttack()
     {
-        return Input.GetButtonDown("Fire1");
+        return Input.GetButton("Fire1");
     }
 
     public override Vector2 RetrieveXYInputs()

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -8,11 +9,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private InputController inputController;
     [SerializeField] private Rigidbody2D body;
     [SerializeField] private CursorPosition cursorPosition;
+    [SerializeField] private Attack attack;
 
     [Header("Speed Values")]
     [SerializeField, Range(0f, 100f)] private float maxSpeed = 4f;
     [SerializeField, Range(0f, 100f)] private float acceleration = 35f;
-    private float speedDivider;
 
     [Header("Rolling")]
     [SerializeField, Range(0f, 100f)] private float rollSpeed = 4f;
@@ -22,56 +23,80 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField, Range(0f, 5f)] private float rollDuration;
     [HideInInspector] public float rollCounter; // Time Spent rolling
 
-    Vector2 direction;
+    public Vector2 direction;
     Vector2 rollDirection;
 
     Vector2 desiredVelocity;
-    Vector2 velocity;
+    public Vector2 velocity;
+
+    public bool isAttacking;
 
     void Update()
     {
         direction = inputController.RetrieveXYInputs();
 
-        if (direction.sqrMagnitude > 1f)
-        {
-            direction = direction.normalized;
-        }
+        isAttacking = inputController.RetrieveAttack();
 
-        if (inputController.RetrieveSlide() && rollCooldownCounter <= 0f)
+        if (!isAttacking)
         {
-            Roll();
+            if (direction.sqrMagnitude > 1f)
+            {
+                direction = direction.normalized;
+            }
 
-            rollCooldownCounter = rollCooldown + rollDuration;
+            if (inputController.RetrieveSlide() && rollCooldownCounter <= 0f)
+            {
+                Roll();
+
+                rollCooldownCounter = rollCooldown + rollDuration;
+            }
+            else
+            {
+                rollCooldownCounter -= Time.deltaTime;
+
+                desiredVelocity = new Vector2(direction.x, direction.y) * maxSpeed;
+            }
         }
         else
         {
-            rollCooldownCounter -= Time.deltaTime;
-
-            desiredVelocity = new Vector2(direction.x, direction.y) * maxSpeed;
+            Debug.Log("Attacking");
         }
     }
 
     private void FixedUpdate()
     {
-        velocity = body.velocity;
-
-        if (rollCounter > 0f)
+        if (!isAttacking)
         {
-            velocity = rollDirection * rollSpeed;
+            attack.ResetDamage();
 
-            rollCounter -= Time.deltaTime;
+            velocity = body.velocity;
+
+            if (rollCounter > 0f)
+            {
+                velocity = rollDirection * rollSpeed;
+
+                rollCounter -= Time.deltaTime;
+            }
+            else
+            {
+                float maxSpeedChange = acceleration * Time.deltaTime;
+                velocity = new Vector2
+                (
+                    Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange),
+                    Mathf.MoveTowards(velocity.y, desiredVelocity.y, maxSpeedChange)
+                );
+            }
+
+            body.velocity = velocity;
         }
         else
         {
-            float maxSpeedChange = acceleration * Time.deltaTime;
-            velocity = new Vector2
-            (
-                Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange),
-                Mathf.MoveTowards(velocity.y, desiredVelocity.y, maxSpeedChange)
-            );
-        }
+            body.velocity = Vector2.zero;
+            direction = Vector2.zero;
+            rollCounter = 0f;
 
-        body.velocity = velocity;
+            attack.DealDamage();
+        }
     }
 
     void Roll()
@@ -92,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Boss"))
         {
-            Debug.Log("ur dead lmao");
+            SceneManager.LoadScene(1);
         }
     }
 }
